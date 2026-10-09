@@ -20,6 +20,39 @@ nix build .#euro-office-desktopeditors
 nix run .#euro-office-desktopeditors
 ```
 
+Run directly from GitHub (no local clone):
+
+```bash
+nix run github:mathew-d/nix-euro-office
+```
+
+## Add to your config
+
+If you use a flake-based NixOS/Home Manager config, add this flake as an input and consume its package:
+
+```nix
+{
+  inputs.euro-office = {
+    url = "github:mathew-d/nix-euro-office";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
+
+  outputs = { self, nixpkgs, ... }@inputs: {
+    # NixOS example
+    nixosConfigurations.my-host = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        ({ pkgs, ... }: {
+          environment.systemPackages = [
+            inputs.euro-office.packages.${pkgs.system}.default
+          ];
+        })
+      ];
+    };
+  };
+}
+```
+
 Optional quick checks:
 
 ```bash
