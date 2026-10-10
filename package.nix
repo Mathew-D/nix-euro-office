@@ -236,6 +236,32 @@ buildFHSEnv {
         printf '%s\n' "$source_id" > "$stamp_file"
       fi
     fi
+
+    # Ensure the compositor can resolve app_id=DesktopEditors when launched via nix run.
+    local_apps_dir="$HOME/.local/share/applications"
+    mkdir -p "$local_apps_dir"
+
+    desktop_src="${derivation}/share/applications/euro-office-euro-office.desktop"
+    desktop_dst="$local_apps_dir/DesktopEditors.desktop"
+    cp -f "$desktop_src" "$desktop_dst"
+    sed -i \
+      -e 's#^Icon=.*#Icon=DesktopEditors#' \
+      -e 's#^StartupWMClass=.*#StartupWMClass=DesktopEditors#' \
+      -e '/^X-GNOME-WMClass=/d' \
+      "$desktop_dst"
+    sed -i '/^StartupWMClass=/a X-GNOME-WMClass=DesktopEditors' "$desktop_dst"
+
+    cp -f "$desktop_dst" "$local_apps_dir/euro-office-desktopeditors.desktop"
+
+    for icon_src in ${derivation}/share/icons/hicolor/*/apps/euro-office-euro-office.png; do
+      if [[ -f "$icon_src" ]]; then
+        icon_size="$(basename "$(dirname "$(dirname "$icon_src")")")"
+        local_icon_dir="$HOME/.local/share/icons/hicolor/$icon_size/apps"
+        mkdir -p "$local_icon_dir"
+        cp -f "$icon_src" "$local_icon_dir/DesktopEditors.png"
+        cp -f "$icon_src" "$local_icon_dir/euro-office-desktopeditors.png"
+      fi
+    done
   '';
 
   extraBwrapArgs = [
@@ -254,14 +280,19 @@ buildFHSEnv {
       pipewire
     ];
 
-  runScript = "/bin/euro-office-euro-office";
+  runScript = "/bin/euro-office-desktopeditors";
 
   extraInstallCommands = ''
     mkdir -p $out/share
     ln -s ${derivation}/share/icons $out/share
     cp -r ${derivation}/share/applications $out/share
+    chmod -R u+w $out/share/applications
     substituteInPlace $out/share/applications/euro-office-euro-office.desktop \
       --replace-fail "/usr/bin/euro-office-euro-office" "$out/bin/euro-office-desktopeditors"
+    substituteInPlace $out/share/applications/euro-office-euro-office.desktop \
+      --replace-fail "StartupWMClass=Euro-Office" "StartupWMClass=DesktopEditors"
+    sed -i '/^X-GNOME-WMClass=/d' $out/share/applications/euro-office-euro-office.desktop
+    sed -i '/^StartupWMClass=/a X-GNOME-WMClass=DesktopEditors' $out/share/applications/euro-office-euro-office.desktop
   '';
 
   meta = derivation.meta // {
