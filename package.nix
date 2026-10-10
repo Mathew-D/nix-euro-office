@@ -250,8 +250,7 @@ buildFHSEnv {
       -e '/^X-GNOME-WMClass=/d' \
       "$desktop_dst"
     sed -i '/^StartupWMClass=/a X-GNOME-WMClass=DesktopEditors' "$desktop_dst"
-
-    cp -f "$desktop_dst" "$local_apps_dir/euro-office-desktopeditors.desktop"
+    rm -f "$local_apps_dir/euro-office-desktopeditors.desktop"
 
     for icon_src in ${derivation}/share/icons/hicolor/*/apps/euro-office-euro-office.png; do
       if [[ -f "$icon_src" ]]; then
@@ -259,7 +258,7 @@ buildFHSEnv {
         local_icon_dir="$HOME/.local/share/icons/hicolor/$icon_size/apps"
         mkdir -p "$local_icon_dir"
         cp -f "$icon_src" "$local_icon_dir/DesktopEditors.png"
-        cp -f "$icon_src" "$local_icon_dir/euro-office-desktopeditors.png"
+        rm -f "$local_icon_dir/euro-office-desktopeditors.png"
       fi
     done
   '';
