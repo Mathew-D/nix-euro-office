@@ -237,30 +237,6 @@ buildFHSEnv {
       fi
     fi
 
-    # Ensure the compositor can resolve app_id=DesktopEditors when launched via nix run.
-    local_apps_dir="$HOME/.local/share/applications"
-    mkdir -p "$local_apps_dir"
-
-    desktop_src="${derivation}/share/applications/euro-office-euro-office.desktop"
-    desktop_dst="$local_apps_dir/DesktopEditors.desktop"
-    cp -f "$desktop_src" "$desktop_dst"
-    sed -i \
-      -e 's#^Icon=.*#Icon=DesktopEditors#' \
-      -e 's#^StartupWMClass=.*#StartupWMClass=DesktopEditors#' \
-      -e '/^X-GNOME-WMClass=/d' \
-      "$desktop_dst"
-    sed -i '/^StartupWMClass=/a X-GNOME-WMClass=DesktopEditors' "$desktop_dst"
-    rm -f "$local_apps_dir/euro-office-desktopeditors.desktop"
-
-    for icon_src in ${derivation}/share/icons/hicolor/*/apps/euro-office-euro-office.png; do
-      if [[ -f "$icon_src" ]]; then
-        icon_size="$(basename "$(dirname "$(dirname "$icon_src")")")"
-        local_icon_dir="$HOME/.local/share/icons/hicolor/$icon_size/apps"
-        mkdir -p "$local_icon_dir"
-        cp -f "$icon_src" "$local_icon_dir/DesktopEditors.png"
-        rm -f "$local_icon_dir/euro-office-desktopeditors.png"
-      fi
-    done
   '';
 
   extraBwrapArgs = [
@@ -288,8 +264,10 @@ buildFHSEnv {
     chmod -R u+w $out/share/applications
     substituteInPlace $out/share/applications/euro-office-euro-office.desktop \
       --replace-fail "/usr/bin/euro-office-euro-office" "$out/bin/euro-office-desktopeditors"
-    substituteInPlace $out/share/applications/euro-office-euro-office.desktop \
-      --replace-fail "StartupWMClass=Euro-Office" "StartupWMClass=DesktopEditors"
+    sed -i \
+      -e 's#^StartupWMClass=.*#StartupWMClass=DesktopEditors#' \
+      -e '/^StartupWMClass=/!a StartupWMClass=DesktopEditors' \
+      $out/share/applications/euro-office-euro-office.desktop
     sed -i '/^X-GNOME-WMClass=/d' $out/share/applications/euro-office-euro-office.desktop
     sed -i '/^StartupWMClass=/a X-GNOME-WMClass=DesktopEditors' $out/share/applications/euro-office-euro-office.desktop
   '';
