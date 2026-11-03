@@ -52,16 +52,16 @@
   xkeyboard_config,
 }:
 let
-  version = "9.3.5-2";
+  version = "9.3.6";
 
   srcBySystem = {
     x86_64-linux = {
-      asset = "euro-office-euro-office-${version}-x86_64.tar.xz";
-      hash = "sha256-yEbT7KDslMn9H/4js/jQT3DrFYxzMsv6QmBW7KkyvFY=";
+      asset = "euro-office-euro-office-9.3.6-0-x86_64.tar.xz";
+      hash = "sha256-2NcIPw1JIB42BjQanKyl/23b6f98kvoXzTD7Z5cUav0=";
     };
     aarch64-linux = {
-      asset = "euro-office-euro-office-${version}-aarch64.tar.xz";
-      hash = "sha256-6ssDFIRWtFJEenYw7eloa5RZF3fFVx0IhRaZAGXH/ms=";
+      asset = "euro-office-euro-office-9.3.6-0-aarch64.tar.xz";
+      hash = "sha256-5Cu8u0BMDs2Js7OASdC1CEzX2Ow44JKJaseTn+ph7O4=";
     };
   };
 
